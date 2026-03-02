@@ -101,12 +101,15 @@ style="border:1px solid black;"></canvas>
 
     // Update player list
     socket.on("updatePlayers", (players) => {
+
         playerList.innerHTML = "";
 
         players.forEach(player => {
+
             const li = document.createElement("li");
-            li.textContent = player;
-            li.id = "player-" + player; // 🔥 important
+            li.textContent = player + " - 0";
+            li.id = "player-" + player;
+
             playerList.appendChild(li);
         });
     });
@@ -325,6 +328,17 @@ style="border:1px solid black;"></canvas>
                 li.style.fontWeight = "normal";
             });
         }
+        socket.on("scoreUpdate", (scores) => {
+
+            Object.keys(scores).forEach(username => {
+
+                const li = document.getElementById("player-" + username);
+
+                if (li) {
+                    li.textContent = username + " - " + scores[username];
+                }
+            });
+        });
 
 </script>
 

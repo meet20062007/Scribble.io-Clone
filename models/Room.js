@@ -8,11 +8,15 @@ class Room {
         this.currentWord = null;
         this.correctGuessers = new Set();
         this.roundTimeout = null;
+        this.scores = {};
+        this.roundStartTime = null;
+        this.roundDuration = 20;
     }
 
     addPlayer(socketId, username) {
         this.players[socketId] = username;
         this.playerOrder.push(socketId);
+        this.scores[socketId] = 0;
     }
 
     getPlayerList() {

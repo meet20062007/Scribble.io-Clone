@@ -153,6 +153,9 @@ io.on("connection", (socket) => {
         });
 
         // Start 20 second timer
+
+        room.roundStartTime = Date.now();
+        room.roundDuration = 20;
         io.to(roomCode).emit("roundStarted", {
             duration: 20,
             startTime: Date.now()
@@ -185,22 +188,41 @@ io.on("connection", (socket) => {
 
             const username = room.players[socket.id];
 
+            // 🔥 Calculate time left
+            const now = Date.now();
+            const elapsed = Math.floor((now - room.roundStartTime) / 1000);
+            const timeLeft = Math.max(room.roundDuration - elapsed, 0);
+
+            const guessPoints = Math.floor(100 * (timeLeft / room.roundDuration));
+            const drawerId = room.getCurrentDrawer();
+
+            // 🔥 Add score
+            room.scores[socket.id] += guessPoints;
+            room.scores[drawerId] += 50;
+
             io.to(roomCode).emit("correctGuess", {
                 username
             });
 
+            // 🔥 Send updated scores (username → score mapping)
+            const scoreData = {};
+
+            for (let id in room.scores) {
+                scoreData[room.players[id]] = room.scores[id];
+            }
+
+            io.to(roomCode).emit("scoreUpdate", scoreData);
+
             const totalPlayers = room.playerOrder.length;
             const totalCorrect = room.correctGuessers.size;
-            const drawerId = room.getCurrentDrawer();
 
-            // If everyone except drawer guessed
             if (totalCorrect === totalPlayers - 1) {
 
                 clearTimeout(room.roundTimeout);
 
                 room.nextDrawer();
                 startRound(roomCode);
-    }
+            }
         }
     });
 });

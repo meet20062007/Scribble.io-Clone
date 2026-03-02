@@ -2,14 +2,14 @@ class Room {
     constructor(roomId){
         this.roomId = roomId;
         this.players = {};
-        this.drawer = null;
+        this.playerOrder = [];
+        this.currentDrawerIndex = 0;
+        this.roundTimer=undefined;
     }
 
     addPlayer(socketId, username) {
         this.players[socketId] = username;
-
-        if (!this.drawer) 
-            this.drawer = socketId;
+        this.playerOrder.push(socketId);
     }
 
     getPlayerList() {
@@ -19,15 +19,31 @@ class Room {
     removePlayer(socketId){
         delete this.players[socketId];
 
-        if (this.drawer === socketId) {
-            const remainingPlayers = Object.keys(this.players);
-            this.drawer = remainingPlayers.length > 0 ? remainingPlayers[0] : null;
+        this.playerOrder = this.playerOrder.filter(id => id !== socketId);
+
+        if (this.currentDrawerIndex >= this.playerOrder.length) {
+            this.currentDrawerIndex = 0;
         }
     }
 
-    getDrawer() {
-        return this.drawer;
+    getCurrentDrawer() {
+        if (this.playerOrder.length === 0) return null;
+        return this.playerOrder[this.currentDrawerIndex];
     }
+
+    nextDrawer() {
+        if (this.playerOrder.length === 0) return null;
+
+        this.currentDrawerIndex =
+            (this.currentDrawerIndex + 1) % this.playerOrder.length;
+
+        return this.getCurrentDrawer();
+    }
+    
+
+    // getDrawer() {
+    //     return this.drawer;
+    // }
 
     isEmpty(){
         return Object.keys(this.players).length === 0;

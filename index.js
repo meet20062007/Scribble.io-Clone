@@ -27,9 +27,33 @@ io.on("connection", (socket) => {
         room.addPlayer(socket.id, username);
 
         io.to(roomCode).emit("updatePlayers", room.getPlayerList());
+        const drawerId = room.getCurrentDrawer();
+        const drawerName = room.players[drawerId];
+
+        io.to(roomCode).emit("updateDrawer", {
+            id: drawerId,
+            name: drawerName
+        });
 
         // Tell everyone who drawer is
-        io.to(roomCode).emit("updateDrawer", room.getDrawer());
+        //io.to(roomCode).emit("updateDrawer", room.getDrawer());
+
+        if (!room.roundTimer) {
+
+            room.roundTimer = setInterval(() => {
+
+                const nextDrawerId = room.nextDrawer();
+                const nextDrawerName = room.players[nextDrawerId];
+
+                io.to(roomCode).emit("updateDrawer", {
+                    id: nextDrawerId,
+                    name: nextDrawerName
+                });
+                io.to(roomCode).emit("clear");
+
+            }, 20000); // 20 seconds per round
+
+        }
     });
 
     socket.on("draw", (data) => {
@@ -40,7 +64,7 @@ io.on("connection", (socket) => {
         const room = rooms[roomCode];
         if (!room) return;
 
-        if (socket.id !== room.getDrawer()) return;
+        if (socket.id !== room.getCurrentDrawer()) return;
 
         socket.to(roomCode).emit("draw", data);
     });
@@ -58,23 +82,39 @@ io.on("connection", (socket) => {
         socket.to(roomCode).emit("clear");
     });
 
-    socket.on("disconnect", () => {
+      socket.on("disconnect", () => {
 
-        const roomCode = socket.roomCode;
-        if (!roomCode) return;
+          const roomCode = socket.roomCode;
+          if (!roomCode) return;
 
-        const room = rooms[roomCode];
-        if (!room) return;
+          const room = rooms[roomCode];
+          if (!room) return;
 
-        room.removePlayer(socket.id);
+          // Remove player
+          room.removePlayer(socket.id);
 
-        io.to(roomCode).emit("updatePlayers", room.getPlayerList());
-        io.to(roomCode).emit("updateDrawer", room.getDrawer());
+          // Update player list for everyone
+          io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 
-        if (room.isEmpty()) {
-            delete rooms[roomCode];
-        }
-    });
+          // Update drawer for everyone
+          const drawerId = room.getCurrentDrawer();
+          const drawerName = room.players[drawerId];
+
+          io.to(roomCode).emit("updateDrawer", {
+              id: drawerId,
+              name: drawerName
+          });
+
+          // If room becomes empty → cleanup
+          if (room.playerOrder.length === 0) {
+
+              // Stop round timer
+              clearInterval(room.roundTimer);
+
+              // Remove room from memory
+              delete rooms[roomCode];
+          }
+      });
 
 });
 

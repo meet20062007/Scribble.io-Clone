@@ -15,6 +15,7 @@
 <button id="leaveBtn">Leave Room</button>
 
 <br><br>
+<h3 id="drawerText"></h3>
 
 <canvas id="board" width="900" height="500"
 style="border:1px solid black;"></canvas>
@@ -149,15 +150,23 @@ style="border:1px solid black;"></canvas>
 
     let isDrawer = false;
 
-    socket.on("updateDrawer", (drawerId) => {
-        if (socket.id === drawerId) {
-            isDrawer = true;
-            alert("You are the drawer!");
+    socket.on("updateDrawer", (data) => {
+
+        const drawerId = data.id;
+        const drawerName = data.name;
+
+        isDrawer = socket.id === drawerId;
+
+        const drawerText = document.getElementById("drawerText");
+
+        if (isDrawer) {
+            drawerText.textContent = "You are drawing!";
+        } else {
+            drawerText.textContent = drawerName + " is drawing...";
         }
-        else 
-        isDrawer = false;
+    });
     
-});
+
 
 </script>
 

@@ -4,7 +4,7 @@ const joinroom = require("../controllers/controller.js");
 const {createRoom,rooms} = require("../models/Rooms.js");
 
 router.get("", (req, res) => {
-    res.render("index");
+    res.redirect("joingame");
 });
 
 router.get("/joingame",(req,res)=>{

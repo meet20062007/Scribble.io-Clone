@@ -2,50 +2,68 @@
 <html>
 <head>
     <title>Room <%= roomCode %></title>
+    <link rel="stylesheet" href="/styles/game.css">
 </head>
 <body>
 
-<h2>Room Code: <%= roomCode %></h2>
+<div class="app">
 
-<h3>Players:</h3>
-<ul id="playerList"></ul>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="room-section">
+            <h2>Room: <%= roomCode %></h2>
+            <h3 id="drawerText"></h3>
+        </div>
+        <div class="timer-section">
+            ⏱ <span id="timer">20</span>s
+        </div>
+    </div>
 
-<br>
+    <!-- MAIN AREA -->
+    <div class="main-container">
 
-<button id="leaveBtn">Leave Room</button>
+        <!-- LEFT: PLAYERS -->
+        <div class="players-panel">
+            <h3>Players</h3>
+            <ul id="playerList"></ul>
+            <button id="leaveBtn">Leave Room</button>
+        </div>
 
-<br><br>
-<h3 id="drawerText"></h3>
-<h3>Time Left: <span id="timer">20</span>s</h3>
+        <!-- CENTER: CANVAS -->
+        <div class="canvas-panel">
+            <canvas id="board" width="1200" height="650"></canvas>
 
-<div id="colorPicker">
-    <button class="color-btn" data-color="black" style="background:black;"></button>
-    <button class="color-btn" data-color="red" style="background:red;"></button>
-    <button class="color-btn" data-color="blue" style="background:blue;"></button>
-    <button class="color-btn" data-color="green" style="background:green;"></button>
-    <button class="color-btn" data-color="yellow" style="background:yellow;"></button>
+            <div class="tool-row">
+                <div id="colorPicker">
+                    <button class="color-btn" data-color="black" style="background:black;"></button>
+                    <button class="color-btn" data-color="red" style="background:red;"></button>
+                    <button class="color-btn" data-color="blue" style="background:blue;"></button>
+                    <button class="color-btn" data-color="green" style="background:green;"></button>
+                    <button class="color-btn" data-color="yellow" style="background:yellow;"></button>
+                </div>
+
+                <button id="eraserBtn">🧽 Eraser</button>
+                <button id="clearBtn">Clear</button>
+            </div>
+
+            <div id="wordSelection" style="display:none;">
+                <h3>Choose a word:</h3>
+                <div id="wordOptions"></div>
+            </div>
+
+            <h3 id="wordHint"></h3>
+        </div>
+
+        <!-- RIGHT: CHAT -->
+        <div class="chat-panel">
+            <h3>Guess</h3>
+            <input type="text" id="chatInput" placeholder="Type your guess..." />
+            <button id="sendBtn">Send</button>
+        </div>
+
+    </div>
+
 </div>
-<button id="eraserBtn">🧽 Eraser</button>
-<canvas id="board" width="900" height="500"
-style="border:1px solid black;"></canvas>
-
-<hr>
-
-<div>
-    <input type="text" id="chatInput" placeholder="Type your guess..." />
-    <button id="sendBtn">Send</button>
-</div>
-
-<div id="wordSelection" style="display:none;">
-    <h3>Choose a word:</h3>
-    <div id="wordOptions"></div>
-</div>
-
-<h3 id="wordHint"></h3>
-
-<br><br>
-
-<button id="clearBtn">Clear</button>
 
 <script src="/socket.io/socket.io.js"></script>
 

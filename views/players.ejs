@@ -193,6 +193,65 @@
         });
     });
 
+    // ===== MOBILE TOUCH SUPPORT =====
+
+canvas.addEventListener("touchstart", (e) => {
+    if (!isDrawer) return;
+
+    e.preventDefault();
+
+    drawing = true;
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+    socket.emit("draw", {
+        x,
+        y,
+        type: "start",
+        color: currentColor,
+        size: currentSize
+    });
+});
+
+canvas.addEventListener("touchmove", (e) => {
+    if (!drawing || !isDrawer) return;
+
+    e.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    socket.emit("draw", {
+        x,
+        y,
+        type: "draw",
+        color: currentColor,
+        size: currentSize
+    });
+});
+
+canvas.addEventListener("touchend", () => {
+    if (!isDrawer) return;
+
+    drawing = false;
+    ctx.beginPath();
+
+    socket.emit("draw", { type: "end" });
+});
+
     function draw(x, y) {
         ctx.lineTo(x, y);
         ctx.stroke();

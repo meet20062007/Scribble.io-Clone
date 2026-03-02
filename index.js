@@ -27,16 +27,35 @@ io.on("connection", (socket) => {
         room.addPlayer(socket.id, username);
 
         io.to(roomCode).emit("updatePlayers", room.getPlayerList());
+
+        // Tell everyone who drawer is
+        io.to(roomCode).emit("updateDrawer", room.getDrawer());
     });
 
     socket.on("draw", (data) => {
-        if (!socket.roomCode) return;
-        socket.to(socket.roomCode).emit("draw", data);
+
+        const roomCode = socket.roomCode;
+        if (!roomCode) return;
+
+        const room = rooms[roomCode];
+        if (!room) return;
+
+        if (socket.id !== room.getDrawer()) return;
+
+        socket.to(roomCode).emit("draw", data);
     });
 
     socket.on("clear", () => {
-        if (!socket.roomCode) return;
-        socket.to(socket.roomCode).emit("clear");
+
+        const roomCode = socket.roomCode;
+        if (!roomCode) return;
+
+        const room = rooms[roomCode];
+        if (!room) return;
+
+        if (socket.id !== room.getDrawer()) return;
+
+        socket.to(roomCode).emit("clear");
     });
 
     socket.on("disconnect", () => {
@@ -50,6 +69,7 @@ io.on("connection", (socket) => {
         room.removePlayer(socket.id);
 
         io.to(roomCode).emit("updatePlayers", room.getPlayerList());
+        io.to(roomCode).emit("updateDrawer", room.getDrawer());
 
         if (room.isEmpty()) {
             delete rooms[roomCode];

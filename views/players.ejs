@@ -64,13 +64,28 @@ style="border:1px solid black;"></canvas>
     });
 
     // Drawing logic
-    canvas.addEventListener("mousedown", () => {
+    canvas.addEventListener("mousedown", (e) => {
+        if (!isDrawer) return;
+
         drawing = true;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        socket.emit("draw", { x, y, type: "start" });
     });
 
     canvas.addEventListener("mouseup", () => {
+        if (!isDrawer) return;
+
         drawing = false;
         ctx.beginPath();
+
+        socket.emit("draw", { type: "end" });
     });
 
     canvas.addEventListener("mouseleave", () => {
@@ -79,14 +94,16 @@ style="border:1px solid black;"></canvas>
     });
 
     canvas.addEventListener("mousemove", (e) => {
-        if (!drawing) return;
+        if (!drawing || !isDrawer) return;
 
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        draw(x, y);
-        socket.emit("draw", { x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        socket.emit("draw", { x, y, type: "draw" });
     });
 
     function draw(x, y) {
@@ -98,11 +115,26 @@ style="border:1px solid black;"></canvas>
 
     // Receive drawing from others
     socket.on("draw", (data) => {
-        draw(data.x, data.y);
+
+        if (data.type === "start") {
+            ctx.beginPath();
+            ctx.moveTo(data.x, data.y);
+        }
+
+        if (data.type === "draw") {
+            ctx.lineTo(data.x, data.y);
+            ctx.stroke();
+        }
+
+        if (data.type === "end") {
+            ctx.beginPath();
+        }
     });
 
     // Clear button
     clearBtn.addEventListener("click", () => {
+        if (!isDrawer) return;
+
         clearCanvas();
         socket.emit("clear");
     });
@@ -114,6 +146,18 @@ style="border:1px solid black;"></canvas>
     socket.on("clear", () => {
         clearCanvas();
     });
+
+    let isDrawer = false;
+
+    socket.on("updateDrawer", (drawerId) => {
+        if (socket.id === drawerId) {
+            isDrawer = true;
+            alert("You are the drawer!");
+        }
+        else 
+        isDrawer = false;
+    
+});
 
 </script>
 

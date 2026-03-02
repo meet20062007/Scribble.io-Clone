@@ -2,10 +2,14 @@ class Room {
     constructor(roomId){
         this.roomId = roomId;
         this.players = {};
+        this.drawer = null;
     }
 
     addPlayer(socketId, username) {
         this.players[socketId] = username;
+
+        if (!this.drawer) 
+            this.drawer = socketId;
     }
 
     getPlayerList() {
@@ -14,6 +18,15 @@ class Room {
 
     removePlayer(socketId){
         delete this.players[socketId];
+
+        if (this.drawer === socketId) {
+            const remainingPlayers = Object.keys(this.players);
+            this.drawer = remainingPlayers.length > 0 ? remainingPlayers[0] : null;
+        }
+    }
+
+    getDrawer() {
+        return this.drawer;
     }
 
     isEmpty(){

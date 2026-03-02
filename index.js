@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const routes = require("./routes/routes");
 const { rooms } = require("./models/Rooms");
 const { getRandomWords } = require("./models/words");
+const PORT = process.env.PORT || 8000;
 
 const app = express();
 const server = http.createServer(app);
@@ -227,6 +228,6 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(8000, () => {
-    console.log("Server running on port 8000");
+server.listen(PORT, () => {
+    console.log("Server running on port " + PORT);
 });

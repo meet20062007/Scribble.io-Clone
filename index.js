@@ -20,12 +20,17 @@ function startRound(roomCode) {
     const room = rooms[roomCode];
     if (!room) return;
 
+    // 🔥 CLEAR OLD TIMER
+    if (room.roundTimeout) {
+        clearTimeout(room.roundTimeout);
+        room.roundTimeout = null;
+    }
+
     room.resetGuesses();
 
     const drawerId = room.getCurrentDrawer();
     const drawerName = room.players[drawerId];
 
-    // Tell everyone who drawer is
     io.to(roomCode).emit("updateDrawer", {
         id: drawerId,
         name: drawerName
@@ -33,7 +38,6 @@ function startRound(roomCode) {
 
     io.to(roomCode).emit("clear");
 
-    // Send word options to drawer only
     const wordOptions = getRandomWords(3);
     io.to(drawerId).emit("chooseWord", wordOptions);
 }

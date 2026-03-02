@@ -169,6 +169,11 @@ style="border:1px solid black;"></canvas>
 
     socket.on("updateDrawer", (data) => {
 
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                document.getElementById("timer").textContent = 20;
+            }
+
         resetPlayerColors();
 
         const drawerId = data.id;

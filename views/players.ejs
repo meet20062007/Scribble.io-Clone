@@ -8,18 +8,43 @@
     <h2>Room Code: <%= roomCode %></h2>
 
     <h3>Players in this room:</h3>
+    <ul id="playerList"></ul>
 
-    <ul>
-        <% players.forEach(function(player) { %>
-            <li><%= player %></li>
-        <% }) %>
-    </ul>
-    <form action="/leave" method="POST">
-    <input type="hidden" name="username" value="<%= username %>">
-    <input type="hidden" name="roomCode" value="<%= roomCode %>">
-    <button type="submit">Leave Room</button>
-</form>
+    <br>
+
+    <button id="leaveBtn">Leave Room</button>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+
+    const roomCode = "<%= roomCode %>";
+    const username = "<%= username %>";
+
+    const playerList = document.getElementById("playerList");
+
+    // Tell server we joined
+    socket.emit("joinRoom", { roomCode, username });
+
+    // Listen for player list updates
+    socket.on("updatePlayers", (players) => {
+
+        playerList.innerHTML = "";
+
+        players.forEach(player => {
+            const li = document.createElement("li");
+            li.textContent = player;
+            playerList.appendChild(li);
+        });
+
+    });
+
+    document.getElementById("leaveBtn").addEventListener("click", () => {
+        socket.disconnect();   // triggers server disconnect logic
+        window.location.href = "/joingame";  // redirect
+    });
+</script>
 
 </body>
-
 </html>

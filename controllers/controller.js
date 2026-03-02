@@ -8,18 +8,15 @@ function joinroom(req,res){
 
     if(action === "create"){
         const createcode = generateRoomCode();
-        const room = createRoom(createcode);
-        room.addplayer(username);
+        createRoom(createcode);
 
-        res.redirect(`/room/${createcode}`);
+        return res.redirect(`/room/${createcode}?username=${username}`);
     }
     else if(action === "join"){
-        if(rooms[roomCode]){
-            rooms[roomCode].addplayer(username);
-            res.redirect(`/room/${roomCode}?username=${username}`);
-        }else{
-            res.send("Room not found");
+        if (!rooms[roomCode]) {
+            return res.send("Room not found");
         }
+        return res.redirect(`/room/${roomCode}?username=${username}`);
     }
 }
 

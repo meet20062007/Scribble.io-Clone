@@ -21,6 +21,13 @@
 <canvas id="board" width="900" height="500"
 style="border:1px solid black;"></canvas>
 
+<hr>
+
+<div>
+    <input type="text" id="chatInput" placeholder="Type your guess..." />
+    <button id="sendBtn">Send</button>
+</div>
+
 <div id="wordSelection" style="display:none;">
     <h3>Choose a word:</h3>
     <div id="wordOptions"></div>
@@ -59,9 +66,11 @@ style="border:1px solid black;"></canvas>
     // Update player list
     socket.on("updatePlayers", (players) => {
         playerList.innerHTML = "";
+
         players.forEach(player => {
             const li = document.createElement("li");
             li.textContent = player;
+            li.id = "player-" + player; // 🔥 important
             playerList.appendChild(li);
         });
     });
@@ -160,6 +169,8 @@ style="border:1px solid black;"></canvas>
 
     socket.on("updateDrawer", (data) => {
 
+        resetPlayerColors();
+
         const drawerId = data.id;
         const drawerName = data.name;
 
@@ -227,6 +238,38 @@ style="border:1px solid black;"></canvas>
             wordHint.textContent = "_ ".repeat(length);
         });
 
+        const chatInput = document.getElementById("chatInput");
+        const sendBtn = document.getElementById("sendBtn");
+
+        sendBtn.addEventListener("click", sendGuess);
+        chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendGuess();
+        });
+
+        function sendGuess() {
+            const guess = chatInput.value.trim();
+            if (!guess) return;
+
+            socket.emit("guess", guess);
+            chatInput.value = "";
+        }
+
+        socket.on("correctGuess", ({ username }) => {
+            const li = document.getElementById("player-" + username);
+            if (li) {
+                li.style.color = "green";
+                li.style.fontWeight = "bold";
+            }
+        });
+
+        function resetPlayerColors() {
+            const listItems = document.querySelectorAll("#playerList li");
+
+            listItems.forEach(li => {
+                li.style.color = "black";
+                li.style.fontWeight = "normal";
+            });
+        }
 
 </script>
 

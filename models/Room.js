@@ -6,6 +6,8 @@ class Room {
         this.currentDrawerIndex = 0;
         this.roundTimer=undefined;
         this.currentWord = null;
+        this.correctGuessers = new Set();
+        this.roundTimeout = null;
     }
 
     addPlayer(socketId, username) {
@@ -46,6 +48,22 @@ class Room {
 
     getWord() {
         return this.currentWord;
+    }
+
+    resetGuesses() {
+        this.correctGuessers.clear();
+    }
+
+    addCorrectGuesser(socketId) {
+        this.correctGuessers.add(socketId);
+    }
+
+    hasGuessed(socketId) {
+        return this.correctGuessers.has(socketId);
+    }
+
+    getCorrectGuessers() {
+        return Array.from(this.correctGuessers);
     }
     
 

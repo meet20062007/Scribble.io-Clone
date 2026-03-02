@@ -20,6 +20,8 @@ function startRound(roomCode) {
     const room = rooms[roomCode];
     if (!room) return;
 
+    room.resetGuesses();
+
     const drawerId = room.getCurrentDrawer();
     const drawerName = room.players[drawerId];
 
@@ -153,12 +155,49 @@ io.on("connection", (socket) => {
         });
 
         // After 20 sec → next round
-        setTimeout(() => {
-
+        room.roundTimeout = setTimeout(() => {
             room.nextDrawer();
             startRound(roomCode);
-
         }, 20000);
+    });
+
+    socket.on("guess", (guess) => {
+
+        const roomCode = socket.roomCode;
+        if (!roomCode) return;
+
+        const room = rooms[roomCode];
+        if (!room) return;
+
+        if (socket.id === room.getCurrentDrawer()) return;
+        if (room.hasGuessed(socket.id)) return;
+
+        const correctWord = room.getWord();
+        if (!correctWord) return;
+
+        if (guess.toLowerCase() === correctWord.toLowerCase()) {
+
+            room.addCorrectGuesser(socket.id);
+
+            const username = room.players[socket.id];
+
+            io.to(roomCode).emit("correctGuess", {
+                username
+            });
+
+            const totalPlayers = room.playerOrder.length;
+            const totalCorrect = room.correctGuessers.size;
+            const drawerId = room.getCurrentDrawer();
+
+            // If everyone except drawer guessed
+            if (totalCorrect === totalPlayers - 1) {
+
+                clearTimeout(room.roundTimeout);
+
+                room.nextDrawer();
+                startRound(roomCode);
+    }
+        }
     });
 });
 

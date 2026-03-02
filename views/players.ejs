@@ -18,6 +18,13 @@
 <h3 id="drawerText"></h3>
 <h3>Time Left: <span id="timer">20</span>s</h3>
 
+<div id="colorPicker">
+    <button class="color-btn" data-color="black" style="background:black;"></button>
+    <button class="color-btn" data-color="red" style="background:red;"></button>
+    <button class="color-btn" data-color="blue" style="background:blue;"></button>
+    <button class="color-btn" data-color="green" style="background:green;"></button>
+    <button class="color-btn" data-color="yellow" style="background:yellow;"></button>
+</div>
 <canvas id="board" width="900" height="500"
 style="border:1px solid black;"></canvas>
 
@@ -51,6 +58,15 @@ style="border:1px solid black;"></canvas>
     const leaveBtn = document.getElementById("leaveBtn");
     const canvas = document.getElementById("board");
     const ctx = canvas.getContext("2d");
+    let currentColor = "black";
+    ctx.strokeStyle = currentColor;
+    const colorButtons = document.querySelectorAll(".color-btn");
+    colorButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            currentColor = button.getAttribute("data-color");
+            ctx.strokeStyle = currentColor;
+        });
+    });
     const clearBtn = document.getElementById("clearBtn");
 
     let drawing = false;
@@ -94,7 +110,7 @@ style="border:1px solid black;"></canvas>
         ctx.beginPath();
         ctx.moveTo(x, y);
 
-        socket.emit("draw", { x, y, type: "start" });
+        socket.emit("draw", { x, y, type: "start", color: currentColor });
     });
 
     canvas.addEventListener("mouseup", () => {
@@ -121,7 +137,7 @@ style="border:1px solid black;"></canvas>
         ctx.lineTo(x, y);
         ctx.stroke();
 
-        socket.emit("draw", { x, y, type: "draw" });
+        socket.emit("draw", { x, y, type: "draw", color: currentColor });
     });
 
     function draw(x, y) {
@@ -133,6 +149,8 @@ style="border:1px solid black;"></canvas>
 
     // Receive drawing from others
     socket.on("draw", (data) => {
+
+        ctx.strokeStyle = data.color || "black";
 
         if (data.type === "start") {
             ctx.beginPath();

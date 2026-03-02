@@ -7,6 +7,30 @@
     <style>    </style>
 </head>
 <body>
-     <h1>Welcome to Scribble.io</h1>
+     <form action="/joingame" method="POST">
+
+        <input 
+            type="text" 
+            name="username" 
+            placeholder="Enter your name" 
+            required
+        >
+
+        <input 
+            type="text" 
+            name="roomCode" 
+            placeholder="Enter room code (for join)"
+        >
+
+        <button type="submit" name="action" value="create">
+            Create Room
+        </button>
+
+        <button type="submit" name="action" value="join">
+            Join Room
+        </button>
+
+    </form>
+
 </body>
 </html>

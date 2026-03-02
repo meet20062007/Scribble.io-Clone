@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Room <%= roomCode %></title>
+</head>
+<body>
+
+    <h2>Room Code: <%= roomCode %></h2>
+
+    <h3>Players in this room:</h3>
+
+    <ul>
+        <% players.forEach(function(player) { %>
+            <li><%= player %></li>
+        <% }) %>
+    </ul>
+    <form action="/leave" method="POST">
+    <input type="hidden" name="username" value="<%= username %>">
+    <input type="hidden" name="roomCode" value="<%= roomCode %>">
+    <button type="submit">Leave Room</button>
+</form>
+
+</body>
+
+</html>

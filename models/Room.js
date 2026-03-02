@@ -5,6 +5,7 @@ class Room {
         this.playerOrder = [];
         this.currentDrawerIndex = 0;
         this.roundTimer=undefined;
+        this.currentWord = null;
     }
 
     addPlayer(socketId, username) {
@@ -38,6 +39,13 @@ class Room {
             (this.currentDrawerIndex + 1) % this.playerOrder.length;
 
         return this.getCurrentDrawer();
+    }
+    setWord(word) {
+        this.currentWord = word;
+    }
+
+    getWord() {
+        return this.currentWord;
     }
     
 

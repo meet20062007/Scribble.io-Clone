@@ -3,6 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const routes = require("./routes/routes");
 const { rooms } = require("./models/Rooms");
+const { getRandomWords } = require("./models/words");
 
 const app = express();
 const server = http.createServer(app);
@@ -13,6 +14,27 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/", routes);
+
+function startRound(roomCode) {
+
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    const drawerId = room.getCurrentDrawer();
+    const drawerName = room.players[drawerId];
+
+    // Tell everyone who drawer is
+    io.to(roomCode).emit("updateDrawer", {
+        id: drawerId,
+        name: drawerName
+    });
+
+    io.to(roomCode).emit("clear");
+
+    // Send word options to drawer only
+    const wordOptions = getRandomWords(3);
+    io.to(drawerId).emit("chooseWord", wordOptions);
+}
 
 io.on("connection", (socket) => {
 
@@ -26,6 +48,11 @@ io.on("connection", (socket) => {
 
         room.addPlayer(socket.id, username);
 
+        if (!room.roundTimer) {
+            room.roundTimer = true; // just to mark game started
+            startRound(roomCode);
+        }
+
         io.to(roomCode).emit("updatePlayers", room.getPlayerList());
         const drawerId = room.getCurrentDrawer();
         const drawerName = room.players[drawerId];
@@ -38,22 +65,6 @@ io.on("connection", (socket) => {
         // Tell everyone who drawer is
         //io.to(roomCode).emit("updateDrawer", room.getDrawer());
 
-        if (!room.roundTimer) {
-
-            room.roundTimer = setInterval(() => {
-
-                const nextDrawerId = room.nextDrawer();
-                const nextDrawerName = room.players[nextDrawerId];
-
-                io.to(roomCode).emit("updateDrawer", {
-                    id: nextDrawerId,
-                    name: nextDrawerName
-                });
-                io.to(roomCode).emit("clear");
-
-            }, 20000); // 20 seconds per round
-
-        }
     });
 
     socket.on("draw", (data) => {
@@ -77,7 +88,7 @@ io.on("connection", (socket) => {
         const room = rooms[roomCode];
         if (!room) return;
 
-        if (socket.id !== room.getDrawer()) return;
+        if (socket.id !== room.getCurrentDrawer()) return;
 
         socket.to(roomCode).emit("clear");
     });
@@ -105,6 +116,9 @@ io.on("connection", (socket) => {
               name: drawerName
           });
 
+          const wordOptions = getRandomWords(3);
+          io.to(drawerId).emit("chooseWord", wordOptions);
+
           // If room becomes empty → cleanup
           if (room.playerOrder.length === 0) {
 
@@ -116,6 +130,36 @@ io.on("connection", (socket) => {
           }
       });
 
+    socket.on("wordSelected", (word) => {
+
+        const roomCode = socket.roomCode;
+        if (!roomCode) return;
+
+        const room = rooms[roomCode];
+        if (!room) return;
+
+        if (socket.id !== room.getCurrentDrawer()) return;
+
+        room.setWord(word);
+
+        io.to(roomCode).emit("wordChosen", {
+            length: word.length
+        });
+
+        // Start 20 second timer
+        io.to(roomCode).emit("roundStarted", {
+            duration: 20,
+            startTime: Date.now()
+        });
+
+        // After 20 sec → next round
+        setTimeout(() => {
+
+            room.nextDrawer();
+            startRound(roomCode);
+
+        }, 20000);
+    });
 });
 
 server.listen(8000, () => {

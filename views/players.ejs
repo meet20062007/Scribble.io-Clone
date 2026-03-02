@@ -5,14 +5,23 @@
 </head>
 <body>
 
-    <h2>Room Code: <%= roomCode %></h2>
+<h2>Room Code: <%= roomCode %></h2>
 
-    <h3>Players in this room:</h3>
-    <ul id="playerList"></ul>
+<h3>Players:</h3>
+<ul id="playerList"></ul>
 
-    <br>
+<br>
 
-    <button id="leaveBtn">Leave Room</button>
+<button id="leaveBtn">Leave Room</button>
+
+<br><br>
+
+<canvas id="board" width="900" height="500"
+style="border:1px solid black;"></canvas>
+
+<br><br>
+
+<button id="clearBtn">Clear</button>
 
 <script src="/socket.io/socket.io.js"></script>
 
@@ -23,27 +32,89 @@
     const username = "<%= username %>";
 
     const playerList = document.getElementById("playerList");
+    const leaveBtn = document.getElementById("leaveBtn");
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+    const clearBtn = document.getElementById("clearBtn");
 
-    // Tell server we joined
+    let drawing = false;
+
+    // Black brush setup
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+
+    // Join room
     socket.emit("joinRoom", { roomCode, username });
 
-    // Listen for player list updates
+    // Update player list
     socket.on("updatePlayers", (players) => {
-
         playerList.innerHTML = "";
-
         players.forEach(player => {
             const li = document.createElement("li");
             li.textContent = player;
             playerList.appendChild(li);
         });
-
     });
 
-    document.getElementById("leaveBtn").addEventListener("click", () => {
-        socket.disconnect();   // triggers server disconnect logic
-        window.location.href = "/joingame";  // redirect
+    // Leave button
+    leaveBtn.addEventListener("click", () => {
+        socket.disconnect();
+        window.location.href = "/joingame";
     });
+
+    // Drawing logic
+    canvas.addEventListener("mousedown", () => {
+        drawing = true;
+    });
+
+    canvas.addEventListener("mouseup", () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+        if (!drawing) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        draw(x, y);
+        socket.emit("draw", { x, y });
+    });
+
+    function draw(x, y) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    // Receive drawing from others
+    socket.on("draw", (data) => {
+        draw(data.x, data.y);
+    });
+
+    // Clear button
+    clearBtn.addEventListener("click", () => {
+        clearCanvas();
+        socket.emit("clear");
+    });
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    socket.on("clear", () => {
+        clearCanvas();
+    });
+
 </script>
 
 </body>

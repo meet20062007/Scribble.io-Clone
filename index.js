@@ -2,41 +2,45 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const routes = require("./routes/routes");
-const {createRoom,rooms} = require("./models/Rooms");
+const { rooms } = require("./models/Rooms");
 
 const app = express();
-const PORT = 8000;
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// View engine
-app.set("view engine", "ejs");
-
-// Static files
-app.use(express.static("public"));
-
-// Routes
-app.use("/", routes);
-
-// HTTP + Socket.io
 const server = http.createServer(app);
 const io = new Server(server);
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+app.use("/", routes);
+
 io.on("connection", (socket) => {
-    socket.on("joinRoom",({roomCode,username})=>{
+
+    socket.on("joinRoom", ({ roomCode, username }) => {
+
         const room = rooms[roomCode];
-        if(!room)
-          return;
+        if (!room) return;
 
-            socket.join(roomCode);
-            socket.roomCode = roomCode;
-            room.addPlayer(socket.id, username);
-            io.to(roomCode).emit("updatePlayers", room.getPlayerList());
+        socket.join(roomCode);
+        socket.roomCode = roomCode;
 
+        room.addPlayer(socket.id, username);
+
+        io.to(roomCode).emit("updatePlayers", room.getPlayerList());
+    });
+
+    socket.on("draw", (data) => {
+        if (!socket.roomCode) return;
+        socket.to(socket.roomCode).emit("draw", data);
+    });
+
+    socket.on("clear", () => {
+        if (!socket.roomCode) return;
+        socket.to(socket.roomCode).emit("clear");
     });
 
     socket.on("disconnect", () => {
+
         const roomCode = socket.roomCode;
         if (!roomCode) return;
 
@@ -51,8 +55,9 @@ io.on("connection", (socket) => {
             delete rooms[roomCode];
         }
     });
+
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(8000, () => {
+    console.log("Server running on port 8000");
 });

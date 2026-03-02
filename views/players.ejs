@@ -25,6 +25,7 @@
     <button class="color-btn" data-color="green" style="background:green;"></button>
     <button class="color-btn" data-color="yellow" style="background:yellow;"></button>
 </div>
+<button id="eraserBtn">🧽 Eraser</button>
 <canvas id="board" width="900" height="500"
 style="border:1px solid black;"></canvas>
 
@@ -59,14 +60,33 @@ style="border:1px solid black;"></canvas>
     const canvas = document.getElementById("board");
     const ctx = canvas.getContext("2d");
     let currentColor = "black";
+    let currentSize = 3;
     ctx.strokeStyle = currentColor;
+    ctx.lineWidth = currentSize;
     const colorButtons = document.querySelectorAll(".color-btn");
+
     colorButtons.forEach(button => {
         button.addEventListener("click", () => {
+
             currentColor = button.getAttribute("data-color");
+            currentSize = 3; // reset to normal brush size
+
             ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentSize;
         });
     });
+
+    const eraserBtn = document.getElementById("eraserBtn");
+
+    eraserBtn.addEventListener("click", () => {
+
+        currentColor = "white";
+        currentSize = 20;
+
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = currentSize;
+    });
+
     const clearBtn = document.getElementById("clearBtn");
 
     let drawing = false;
@@ -110,7 +130,13 @@ style="border:1px solid black;"></canvas>
         ctx.beginPath();
         ctx.moveTo(x, y);
 
-        socket.emit("draw", { x, y, type: "start", color: currentColor });
+        socket.emit("draw", { 
+            x, 
+            y, 
+            type: "start", 
+            color: currentColor,
+            size: currentSize
+        });
     });
 
     canvas.addEventListener("mouseup", () => {
@@ -137,7 +163,13 @@ style="border:1px solid black;"></canvas>
         ctx.lineTo(x, y);
         ctx.stroke();
 
-        socket.emit("draw", { x, y, type: "draw", color: currentColor });
+        socket.emit("draw", { 
+            x, 
+            y, 
+            type: "draw", 
+            color: currentColor,
+            size: currentSize
+        });
     });
 
     function draw(x, y) {
@@ -149,8 +181,8 @@ style="border:1px solid black;"></canvas>
 
     // Receive drawing from others
     socket.on("draw", (data) => {
-
         ctx.strokeStyle = data.color || "black";
+        ctx.lineWidth = data.size || 3;
 
         if (data.type === "start") {
             ctx.beginPath();

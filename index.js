@@ -152,20 +152,20 @@ io.on("connection", (socket) => {
             length: word.length
         });
 
-        // Start 20 second timer
+        // Start 90 second timer
 
         room.roundStartTime = Date.now();
-        room.roundDuration = 20;
+        room.roundDuration = 90;
         io.to(roomCode).emit("roundStarted", {
-            duration: 20,
+            duration: 90,
             startTime: Date.now()
         });
 
-        // After 20 sec → next round
+        // After 90 sec → next round
         room.roundTimeout = setTimeout(() => {
             room.nextDrawer();
             startRound(roomCode);
-        }, 20000);
+        }, 90000);
     });
 
     socket.on("guess", (guess) => {

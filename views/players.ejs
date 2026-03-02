@@ -15,7 +15,7 @@
             <h3 id="drawerText"></h3>
         </div>
         <div class="timer-section">
-            ⏱ <span id="timer">20</span>s
+            ⏱ <span id="timer">90</span>s
         </div>
     </div>
 
@@ -99,7 +99,7 @@
     eraserBtn.addEventListener("click", () => {
 
         currentColor = "white";
-        currentSize = 20;
+        currentSize = 90;
 
         ctx.strokeStyle = currentColor;
         ctx.lineWidth = currentSize;
@@ -242,7 +242,7 @@
 
             if (countdownInterval) {
                 clearInterval(countdownInterval);
-                document.getElementById("timer").textContent = 20;
+                document.getElementById("timer").textContent = 90;
             }
 
         resetPlayerColors();

@@ -4,8 +4,6 @@ const Room = require("../models/Room");
 function joinroom(req,res){
     const { username, roomCode, action } = req.body;
 
-    //console.log(username, roomCode, action);
-
     if(action === "create"){
         const createcode = generateRoomCode();
         createRoom(createcode);

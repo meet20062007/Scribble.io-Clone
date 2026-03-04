@@ -32,10 +32,7 @@ function startRound(roomCode) {
     const drawerId = room.getCurrentDrawer();
     const drawerName = room.players[drawerId];
 
-    io.to(roomCode).emit("updateDrawer", {
-        id: drawerId,
-        name: drawerName
-    });
+    io.to(roomCode).emit("updateDrawer", {drawerId,drawerName});
 
     io.to(roomCode).emit("clear");
 
@@ -50,8 +47,8 @@ io.on("connection", (socket) => {
         const room = rooms[roomCode];
         if (!room) return;
 
-        socket.join(roomCode);
-        socket.roomCode = roomCode;
+        socket.join(roomCode);   //By writing this we can write io.to(roomCode).emit() to send message to everyone in that room
+        socket.roomCode = roomCode;   //We are creating a new property (variable) on the socket object to access roomcode , instead of asking roomcode from frontend everytime
 
         room.addPlayer(socket.id, username);
 
@@ -64,10 +61,7 @@ io.on("connection", (socket) => {
         const drawerId = room.getCurrentDrawer();
         const drawerName = room.players[drawerId];
 
-        io.to(roomCode).emit("updateDrawer", {
-            id: drawerId,
-            name: drawerName
-        });
+        io.to(roomCode).emit("updateDrawer", {drawerId,drawerName});
 
         // Tell everyone who drawer is
         //io.to(roomCode).emit("updateDrawer", room.getDrawer());
@@ -150,7 +144,8 @@ io.on("connection", (socket) => {
         room.setWord(word);
 
         io.to(roomCode).emit("wordChosen", {
-            length: word.length
+            length: word.length,
+            word: word
         });
 
         // Start 90 second timer

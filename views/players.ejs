@@ -297,17 +297,15 @@ canvas.addEventListener("touchend", () => {
 
     let isDrawer = false;
 
-    socket.on("updateDrawer", (data) => {
+    socket.on("updateDrawer", ({drawerId,drawerName}) => {
 
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-                document.getElementById("timer").textContent = 90;
-            }
+        if (countdownInterval) 
+        {
+            clearInterval(countdownInterval);
+            document.getElementById("timer").textContent = 90;
+        }
 
         resetPlayerColors();
-
-        const drawerId = data.id;
-        const drawerName = data.name;
 
         isDrawer = socket.id === drawerId;
 
@@ -343,8 +341,8 @@ canvas.addEventListener("touchend", () => {
             }
         }
 
-        updateTimer(); // run immediately
-        countdownInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);//the setinterval is an inbuilt function which runs a specific function every given interval . In this case updateTimer every 1 second
     });
 
             const wordSelection = document.getElementById("wordSelection");
@@ -369,7 +367,11 @@ canvas.addEventListener("touchend", () => {
             });
         });
 
-        socket.on("wordChosen", ({ length }) => {
+        socket.on("wordChosen", ({ length,word }) => {
+
+            if (isDrawer) 
+            wordHint.textContent = "You chose: " + word;
+            else
             wordHint.textContent = "_ ".repeat(length);
         });
 
@@ -397,7 +399,7 @@ canvas.addEventListener("touchend", () => {
             }
         });
 
-        function resetPlayerColors() {
+        function resetPlayerColors() {      // Reset all player colors to black when a new round starts which were changed to green on correct guess
             const listItems = document.querySelectorAll("#playerList li");
 
             listItems.forEach(li => {

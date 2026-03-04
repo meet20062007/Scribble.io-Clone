@@ -112,10 +112,7 @@ io.on("connection", (socket) => {
           const drawerId = room.getCurrentDrawer();
           const drawerName = room.players[drawerId];
 
-          io.to(roomCode).emit("updateDrawer", {
-              id: drawerId,
-              name: drawerName
-          });
+          io.to(roomCode).emit("updateDrawer", {drawerId,drawerName });
 
           const wordOptions = getRandomWords(3);
           io.to(drawerId).emit("chooseWord", wordOptions);

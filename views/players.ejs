@@ -51,15 +51,17 @@
                 <div id="wordOptions"></div>
             </div>
 
-            <h3 id="wordHint"></h3>
+            <h1 id="wordHint"></h1>
         </div>
 
         <!-- RIGHT: CHAT -->
         <div class="chat-panel">
             <h3>Guess</h3>
             <div id="chatMessages"></div>
-            <input type="text" id="chatInput" placeholder="Type your guess..." />
-            <button id="sendBtn">Send</button>
+            <div id =guessBox>
+                <input type="text" id="chatInput" placeholder="Type your guess..." />
+                <button id="sendBtn">Send</button>
+            </div>
         </div>
 
     </div>
@@ -77,6 +79,7 @@
     const playerList = document.getElementById("playerList");
     const leaveBtn = document.getElementById("leaveBtn");
     const canvas = document.getElementById("board");
+    const toolRow = document.querySelector(".tool-row");
     const ctx = canvas.getContext("2d");
     let currentColor = "black";
     let currentSize = 3;
@@ -310,6 +313,14 @@ canvas.addEventListener("touchend", () => {
 
         isDrawer = socket.id === drawerId;
 
+        if (isDrawer) {
+            guessBox.style.display = "none";
+            toolRow.style.display = "flex";
+        } else {
+            guessBox.style.display = "block";
+            toolRow.style.display = "none";
+        }
+
         const drawerText = document.getElementById("drawerText");
 
         if (isDrawer) {
@@ -373,11 +384,12 @@ canvas.addEventListener("touchend", () => {
             if (isDrawer) 
             wordHint.textContent = "You chose: " + word;
             else
-            wordHint.textContent = "_ ".repeat(length);
+            wordHint.textContent = "_ ".repeat(length) + " (" + length + ")";
         });
 
         const chatInput = document.getElementById("chatInput");
         const sendBtn = document.getElementById("sendBtn");
+        const guessBox = document.getElementById("guessBox");
         const chatMessages = document.getElementById("chatMessages");
 
         sendBtn.addEventListener("click", sendGuess);

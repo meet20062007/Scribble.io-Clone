@@ -57,6 +57,7 @@
         <!-- RIGHT: CHAT -->
         <div class="chat-panel">
             <h3>Guess</h3>
+            <div id="chatMessages"></div>
             <input type="text" id="chatInput" placeholder="Type your guess..." />
             <button id="sendBtn">Send</button>
         </div>
@@ -377,6 +378,7 @@ canvas.addEventListener("touchend", () => {
 
         const chatInput = document.getElementById("chatInput");
         const sendBtn = document.getElementById("sendBtn");
+        const chatMessages = document.getElementById("chatMessages");
 
         sendBtn.addEventListener("click", sendGuess);
         chatInput.addEventListener("keypress", (e) => {
@@ -397,6 +399,20 @@ canvas.addEventListener("touchend", () => {
                 li.style.color = "green";
                 li.style.fontWeight = "bold";
             }
+
+            const msg = document.createElement("div");
+            msg.textContent = username + " guessed correctly!";
+            msg.style.fontStyle = "italic";
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+        socket.on("chatMessage", ({ username, message }) => {
+            const msg = document.createElement("div");
+            msg.textContent = username + ": " + message;
+
+            chatMessages.appendChild(msg);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         });
 
         function resetPlayerColors() {      // Reset all player colors to black when a new round starts which were changed to green on correct guess

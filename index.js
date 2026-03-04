@@ -220,6 +220,15 @@ io.on("connection", (socket) => {
                 startRound(roomCode);
             }
         }
+        else {
+            const username = room.players[socket.id];
+
+            io.to(roomCode).emit("chatMessage", {
+                username,
+                message: guess
+            });
+
+        }
     });
 });
 

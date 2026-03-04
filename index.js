@@ -108,6 +108,14 @@ io.on("connection", (socket) => {
           // Update player list for everyone
           io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 
+          const scoreData = {};
+
+            for (let id in room.scores) {
+                scoreData[room.players[id]] = room.scores[id];
+            }
+
+            io.to(roomCode).emit("scoreUpdate", scoreData);
+
           // Update drawer for everyone
           const drawerId = room.getCurrentDrawer();
           const drawerName = room.players[drawerId];

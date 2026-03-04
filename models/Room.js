@@ -25,6 +25,7 @@ class Room {
 
     removePlayer(socketId){
         delete this.players[socketId];
+        delete this.scores[socketId];  
 
         this.playerOrder = this.playerOrder.filter(id => id !== socketId);
 

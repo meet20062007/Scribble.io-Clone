@@ -29,7 +29,14 @@ function startRound(roomCode) {
         room.roundTimeout = null;
     }
 
+    // 🔥 CLEAR OLD HINT INTERVAL
+    if (room.hintInterval) {
+        clearInterval(room.hintInterval);
+        room.hintInterval = null;
+    }
+
     room.resetGuesses();
+    room.resetHintReveal();
     room.setGameState("choosing a word");
 
     const drawerId = room.getCurrentDrawer();
@@ -155,6 +162,7 @@ io.on("connection", (socket) => {
 
         room.setWord(word);
         room.setGameState("drawing");
+        room.resetHintReveal();
 
         const drawerId = room.getCurrentDrawer();
         const drawerName = room.players[drawerId];
@@ -171,7 +179,6 @@ io.on("connection", (socket) => {
         });
 
         // Start 90 second timer
-
         room.roundStartTime = Date.now();
         room.roundDuration = 90;
         io.to(roomCode).emit("roundStarted", {
@@ -179,8 +186,33 @@ io.on("connection", (socket) => {
             startTime: Date.now()
         });
 
+        // 🔥 START HINT INTERVAL - Emit hint every 20 seconds
+        if (room.hintInterval) {
+            clearInterval(room.hintInterval);
+        }
+
+        // First hint after 20 seconds, then every 20 seconds after that
+        room.hintInterval = setInterval(() => {
+            const currentWord = room.getWord();
+            if (!currentWord) return;
+            
+            room.revealRandomLetter(currentWord);
+            const hint = room.getHint(currentWord);
+            
+            // Send hints ONLY to current non-drawer players who haven't guessed
+            room.playerOrder.forEach(playerId => {
+                if (playerId !== drawerId && !room.hasGuessed(playerId)) {
+                    io.to(playerId).emit("hintUpdate", { hint });
+                }
+            });
+        }, 20000);
+
         // After 90 sec → next round
         room.roundTimeout = setTimeout(() => {
+            if (room.hintInterval) {
+                clearInterval(room.hintInterval);
+                room.hintInterval = null;
+            }
             room.nextDrawer();
             startRound(roomCode);
         }, 90000);

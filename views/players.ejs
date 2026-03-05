@@ -368,6 +368,7 @@ canvas.addEventListener("touchend", () => {
             const wordSelection = document.getElementById("wordSelection");
         const wordOptionsDiv = document.getElementById("wordOptions");
         const wordHint = document.getElementById("wordHint");
+        let wordLength = 0;
 
         socket.on("chooseWord", (words) => {
 
@@ -389,10 +390,21 @@ canvas.addEventListener("touchend", () => {
 
         socket.on("wordChosen", ({ length,word }) => {
 
-            if (isDrawer) 
-            wordHint.textContent = "You chose: " + word;
-            else
-            wordHint.textContent = "_ ".repeat(length) + " (" + length + ")";
+            hasGuessedCorrectly = false;  // Reset when new word is chosen
+            wordLength = length;  // Store the length
+
+            if (isDrawer) {
+                wordHint.textContent = "You chose: " + word;
+            } else {
+                wordHint.textContent = "_ ".repeat(length) + " (" + length + ")";
+            }
+        });
+
+        socket.on("hintUpdate", ({ hint }) => {
+            // Only guessers (non-drawers) who haven't guessed correctly should see hints
+            if (!isDrawer && !hasGuessedCorrectly) {
+                wordHint.textContent = hint + " (" + wordLength + ")";
+            }
         });
 
         const chatInput = document.getElementById("chatInput");
@@ -428,6 +440,7 @@ canvas.addEventListener("touchend", () => {
         });
 
         socket.on("revealWord",({correctWord})=>{
+            hasGuessedCorrectly = true;  // Mark that user guessed correctly
             wordHint.textContent = correctWord;
         });
         socket.on("chatMessage", ({ username, message }) => {
@@ -450,6 +463,7 @@ canvas.addEventListener("touchend", () => {
 
         socket.on("roundEnded", () => {
 
+            hasGuessedCorrectly = false;  // Reset for new round
             resetPlayerColors();
             wordHint.textContent = "";
             document.getElementById("drawerText").textContent = "";

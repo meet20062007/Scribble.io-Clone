@@ -12,6 +12,10 @@ class Room {
         this.roundStartTime = null;
         this.roundDuration = 90;
         this.gameState = "choosing a word";
+        this.hintRevealCount = 0;
+        this.hintInterval = null;
+        this.revealedLetterIndices = new Set();
+        this.currentHint = "";
     }
 
     addPlayer(socketId, username) {
@@ -81,6 +85,70 @@ class Room {
 
     getGameState() {
         return this.gameState;
+    }
+
+    getHint(word) {
+        if (!word) return "";
+
+        const wordLength = word.length;
+        const hint = word.split("");
+
+        // Hide all letters initially
+        for (let i = 0; i < wordLength; i++) {
+            hint[i] = "_";
+        }
+
+        // Reveal only the letters that are in revealedLetterIndices
+        this.revealedLetterIndices.forEach(index => {
+            if (index < wordLength) {
+                hint[index] = word[index];
+            }
+        });
+
+        const hintStr = hint.join(" ");
+        this.currentHint = hintStr;
+        return hintStr;
+    }
+
+    getCurrentHint() {
+        return this.currentHint;
+    }
+
+    revealRandomLetter(word) {
+        if (!word) return;
+
+        const wordLength = word.length;
+        const unrevealed = [];
+
+        // Find all unrevealed letter indices
+        for (let i = 0; i < wordLength; i++) {
+            if (!this.revealedLetterIndices.has(i)) {
+                unrevealed.push(i);
+            }
+        }
+
+        // Pick a random unrevealed letter (but never reveal the complete word)
+        if (unrevealed.length > 1) {
+            const randomIndex = Math.floor(Math.random() * unrevealed.length);
+            this.revealedLetterIndices.add(unrevealed[randomIndex]);
+        } else if (unrevealed.length === 1 && wordLength > 1) {
+            // If only 1 letter left, don't reveal it (never complete word)
+            return;
+        }
+    }
+
+    incrementHintReveal() {
+        this.hintRevealCount++;
+    }
+
+    resetHintReveal() {
+        this.hintRevealCount = 0;
+        this.revealedLetterIndices.clear();
+        this.currentHint = "";
+    }
+
+    getHintRevealCount() {
+        return this.hintRevealCount;
     }
 
     // getDrawer() {

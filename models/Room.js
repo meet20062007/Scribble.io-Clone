@@ -10,7 +10,8 @@ class Room {
         this.roundTimeout = null;
         this.scores = {};
         this.roundStartTime = null;
-        this.roundDuration = 20;
+        this.roundDuration = 90;
+        this.gameState = "choosing a word";
     }
 
     addPlayer(socketId, username) {
@@ -73,7 +74,14 @@ class Room {
     getCorrectGuessers() {
         return Array.from(this.correctGuessers);
     }
-    
+
+    setGameState(state) {
+        this.gameState = state;
+    }
+
+    getGameState() {
+        return this.gameState;
+    }
 
     // getDrawer() {
     //     return this.drawer;

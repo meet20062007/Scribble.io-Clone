@@ -30,11 +30,16 @@ function startRound(roomCode) {
     }
 
     room.resetGuesses();
+    room.setGameState("choosing a word");
 
     const drawerId = room.getCurrentDrawer();
     const drawerName = room.players[drawerId];
 
-    io.to(roomCode).emit("updateDrawer", {drawerId,drawerName});
+    io.to(roomCode).emit("updateDrawer", {
+        drawerId,
+        drawerName,
+        state: room.getGameState()
+    });
 
     io.to(roomCode).emit("clear");
 
@@ -149,6 +154,16 @@ io.on("connection", (socket) => {
         if (socket.id !== room.getCurrentDrawer()) return;
 
         room.setWord(word);
+        room.setGameState("drawing");
+
+        const drawerId = room.getCurrentDrawer();
+        const drawerName = room.players[drawerId];
+
+        io.to(roomCode).emit("updateDrawer", {
+            drawerId,
+            drawerName,
+            state: room.getGameState()
+        });
 
         io.to(roomCode).emit("wordChosen", {
             length: word.length,

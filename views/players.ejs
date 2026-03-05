@@ -301,7 +301,7 @@ canvas.addEventListener("touchend", () => {
 
     let isDrawer = false;
 
-    socket.on("updateDrawer", ({drawerId,drawerName}) => {
+    socket.on("updateDrawer", ({drawerId,drawerName,state}) => {
 
         if (countdownInterval) 
         {
@@ -324,9 +324,17 @@ canvas.addEventListener("touchend", () => {
         const drawerText = document.getElementById("drawerText");
 
         if (isDrawer) {
-            drawerText.textContent = "You are drawing!";
+            if (state === "choosing a word") {
+                drawerText.textContent = "Choose a word!";
+            } else {
+                drawerText.textContent = "You are drawing!";
+            }
         } else {
-            drawerText.textContent = drawerName + " is drawing...";
+            if (state === "choosing a word") {
+                drawerText.textContent = drawerName + " is choosing a word...";
+            } else {
+                drawerText.textContent = drawerName + " is drawing...";
+            }
         }
     });
     

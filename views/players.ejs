@@ -129,8 +129,8 @@
         players.forEach(player => {
 
             const li = document.createElement("li");
-            li.textContent = player;
-            li.id = "player-" + player;
+            li.textContent = player.username + " - " + player.score;
+            li.id = "player-" + player.username;
 
             playerList.appendChild(li);
         });

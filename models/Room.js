@@ -20,7 +20,10 @@ class Room {
     }
 
     getPlayerList() {
-        return Object.values(this.players);
+        return this.playerOrder.map(id => ({
+            username: this.players[id],
+            score: this.scores[id]
+        }));
     }
 
     removePlayer(socketId){

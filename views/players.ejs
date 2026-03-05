@@ -418,6 +418,10 @@ canvas.addEventListener("touchend", () => {
             chatMessages.appendChild(msg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         });
+
+        socket.on("revealWord",({correctWord})=>{
+            wordHint.textContent = correctWord;
+        });
         socket.on("chatMessage", ({ username, message }) => {
             const msg = document.createElement("div");
             msg.textContent = username + ": " + message;
@@ -435,6 +439,17 @@ canvas.addEventListener("touchend", () => {
                 li.style.fontWeight = "normal";
             });
         }
+
+        socket.on("roundEnded", () => {
+
+            resetPlayerColors();
+            wordHint.textContent = "";
+            document.getElementById("drawerText").textContent = "";
+
+            guessBox.style.display = "block";
+            toolRow.style.display = "none";
+        });
+
         socket.on("scoreUpdate", (scores) => {
 
             Object.keys(scores).forEach(username => {

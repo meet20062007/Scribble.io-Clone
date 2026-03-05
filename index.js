@@ -21,6 +21,8 @@ function startRound(roomCode) {
     const room = rooms[roomCode];
     if (!room) return;
 
+    io.to(roomCode).emit("roundEnded");
+
     // 🔥 CLEAR OLD TIMER
     if (room.roundTimeout) {
         clearTimeout(room.roundTimeout);
@@ -200,6 +202,8 @@ io.on("connection", (socket) => {
             // 🔥 Add score
             room.scores[socket.id] += guessPoints;
             room.scores[drawerId] += 50;
+
+            io.to(socket.id).emit("revealWord", {correctWord});
 
             io.to(roomCode).emit("correctGuess", {
                 username

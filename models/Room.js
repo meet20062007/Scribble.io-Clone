@@ -9,6 +9,7 @@ class Room {
         this.correctGuessers = new Set();
         this.roundTimeout = null;
         this.scores = {};
+        this.currentRoundScores = {};
         this.roundStartTime = null;
         this.roundDuration = 90;
         this.gameState = "choosing a word";

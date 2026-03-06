@@ -21,7 +21,18 @@ function startRound(roomCode) {
     const room = rooms[roomCode];
     if (!room) return;
 
-    io.to(roomCode).emit("roundEnded");
+    const roundResults = [];
+    for (let id in room.currentRoundScores) {
+        roundResults.push({
+            username: room.players[id],
+            points: room.currentRoundScores[id] || 0
+        });
+    }   
+
+    roundResults.sort((a, b) => b.points - a.points);
+    io.to(roomCode).emit("roundEnded", roundResults);
+
+    room.currentRoundScores = {};
 
     // 🔥 CLEAR OLD TIMER
     if (room.roundTimeout) {
@@ -247,6 +258,8 @@ io.on("connection", (socket) => {
             const drawerId = room.getCurrentDrawer();
 
             // 🔥 Add score
+            room.currentRoundScores[socket.id] = guessPoints;
+            room.currentRoundScores[drawerId] = (room.currentRoundScores[drawerId] || 0) + 50;
             room.scores[socket.id] += guessPoints;
             room.scores[drawerId] += 50;
 

@@ -123,6 +123,41 @@ body {
     gap: 10px;
 }
 
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.6);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+}
+
+.scoreCard {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#roundScores {
+    list-style: none;
+    padding: 0;
+}
+
+#roundScores li {
+    color: #2ecc71;
+    font-weight: bold;
+    font-size: 20px;
+    margin: 6px 0;
+}
+
 .color-btn {
     width: 28px;
     height: 28px;

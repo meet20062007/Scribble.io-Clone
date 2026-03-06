@@ -83,13 +83,10 @@ io.on("connection", (socket) => {
         }
 
         io.to(roomCode).emit("updatePlayers", room.getPlayerList());
+
         const drawerId = room.getCurrentDrawer();
         const drawerName = room.players[drawerId];
-
-        io.to(roomCode).emit("updateDrawer", {drawerId,drawerName});
-
-        // Tell everyone who drawer is
-        //io.to(roomCode).emit("updateDrawer", room.getDrawer());
+        io.to(roomCode).emit("updateDrawer", {drawerId,drawerName,state: room.getGameState()});
 
     });
 

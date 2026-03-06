@@ -316,8 +316,6 @@ canvas.addEventListener("touchend", () => {
             document.getElementById("timer").textContent = 90;
         }
 
-        resetPlayerColors();
-
         isDrawer = socket.id === drawerId;
 
         if (isDrawer) {
@@ -495,19 +493,6 @@ canvas.addEventListener("touchend", () => {
             guessBox.style.display = "block";
             toolRow.style.display = "none";
         });
-
-        socket.on("scoreUpdate", (scores) => {
-
-            Object.keys(scores).forEach(username => {
-
-                const li = document.getElementById("player-" + username);
-
-                if (li) {
-                    li.textContent = username + " - " + scores[username];
-                }
-            });
-        });
-
 </script>
 
 </body>

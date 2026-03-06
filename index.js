@@ -130,14 +130,6 @@ io.on("connection", (socket) => {
           // Update player list for everyone
           io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 
-          const scoreData = {};
-
-            for (let id in room.scores) {
-                scoreData[room.players[id]] = room.scores[id];
-            }
-
-            io.to(roomCode).emit("scoreUpdate", scoreData);
-
           // Update drawer for everyone
           const drawerId = room.getCurrentDrawer();
           const drawerName = room.players[drawerId];
@@ -149,10 +141,6 @@ io.on("connection", (socket) => {
 
           // If room becomes empty → cleanup
           if (room.playerOrder.length === 0) {
-
-              // Stop round timer
-              clearInterval(room.roundTimer);
-
               // Remove room from memory
               delete rooms[roomCode];
           }
@@ -266,14 +254,7 @@ io.on("connection", (socket) => {
                 username
             });
 
-            // 🔥 Send updated scores (username → score mapping)
-            const scoreData = {};
-
-            for (let id in room.scores) {
-                scoreData[room.players[id]] = room.scores[id];
-            }
-
-            io.to(roomCode).emit("scoreUpdate", scoreData);
+            io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 
             const totalPlayers = room.playerOrder.length;
             const totalCorrect = room.correctGuessers.size;

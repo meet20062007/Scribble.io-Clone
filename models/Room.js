@@ -1,18 +1,18 @@
 class Room {
     constructor(roomId){
-        this.roomId = roomId;
-        this.players = {};
-        this.playerOrder = [];
-        this.currentDrawerIndex = 0;
-        this.roundTimer=undefined;
-        this.currentWord = null;
-        this.correctGuessers = new Set();
-        this.roundTimeout = null;
-        this.scores = {};
-        this.currentRoundScores = {};
-        this.roundStartTime = null;
-        this.roundDuration = 90;
-        this.gameState = "choosing a word";
+        this.roomId = roomId;   //
+        this.players = {};      //socketId: username
+        this.playerOrder = [];      //a vector stores socketId
+        this.currentDrawerIndex = 0;    //
+        this.roundTimer=undefined;      //a bool flag , so that , we does not call startround multiple times if a new player joins
+        this.currentWord = null;    //
+        this.correctGuessers = new Set();   //socketId of correct guessers for current round
+        this.roundTimeout = null;       //stores a timer Id which will execute after 90 sec , this is used if we want to stop the timer when all players guess the word before 90 sec
+        this.scores = {};   //socketId: score
+        this.currentRoundScores = {};   //socketId:points for current round
+        this.roundStartTime = null;     //Timestamp of when the round Started
+        this.roundDuration = 90;    //
+        this.gameState = "choosing a word";     //choosing a word,drawing
         this.hintRevealCount = 0;
         this.hintInterval = null;
         this.revealedLetterIndices = new Set();

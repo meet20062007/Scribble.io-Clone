@@ -310,12 +310,6 @@ canvas.addEventListener("touchend", () => {
 
     socket.on("updateDrawer", ({drawerId,drawerName,state}) => {
 
-        if (countdownInterval) 
-        {
-            clearInterval(countdownInterval);
-            document.getElementById("timer").textContent = 90;
-        }
-
         isDrawer = socket.id === drawerId;
 
         if (isDrawer) {
@@ -353,6 +347,7 @@ canvas.addEventListener("touchend", () => {
         if (countdownInterval) {
             clearInterval(countdownInterval);
         }
+        timerElement.textContent = duration;
 
         function updateTimer() {
 
@@ -467,6 +462,13 @@ canvas.addEventListener("touchend", () => {
         }
 
         socket.on("roundEnded", (roundResults) => {
+
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            const timerElement = document.getElementById("timer");
+            timerElement.textContent = 90;
+
 
             const overlay = document.getElementById("roundOverlay");
             const list = document.getElementById("roundScores");

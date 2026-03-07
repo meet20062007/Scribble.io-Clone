@@ -35,7 +35,10 @@ class Room {
     removePlayer(socketId){
         delete this.players[socketId];
         delete this.scores[socketId];  
-
+        delete this.currentRoundScores[socketId];
+        if(this.correctGuessers.has(socketId)){ 
+            this.correctGuessers.delete(socketId);
+        }
         this.playerOrder = this.playerOrder.filter(id => id !== socketId);
 
         if (this.currentDrawerIndex >= this.playerOrder.length) {

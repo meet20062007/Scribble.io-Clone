@@ -134,35 +134,37 @@ io.on("connection", (socket) => {
         socket.to(roomCode).emit("clear");
     });
 
-      socket.on("disconnect", () => {
+    socket.on("disconnect", () => {
 
-          const roomCode = socket.roomCode;
-          if (!roomCode) return;
+        const roomCode = socket.roomCode;
+        if (!roomCode) return;
 
-          const room = rooms[roomCode];
-          if (!room) return;
+        const room = rooms[roomCode];
+        if (!room) return;
 
-          // Remove player
-          room.removePlayer(socket.id);
+        const wasDrawer = socket.id === room.getCurrentDrawer();
 
-          // Update player list for everyone
-          io.to(roomCode).emit("updatePlayers", room.getPlayerList());
+        room.removePlayer(socket.id);
 
-          // Update drawer for everyone
-          const drawerId = room.getCurrentDrawer();
-          const drawerName = room.players[drawerId];
+        io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 
-          io.to(roomCode).emit("updateDrawer", {drawerId,drawerName });
+        if (wasDrawer) {
+            room.nextDrawer();
+            startRound(roomCode);
+        }
 
-          const wordOptions = getRandomWords(3);
-          io.to(drawerId).emit("chooseWord", wordOptions);
+        if (room.correctGuessers.size === room.playerOrder.length - 1) {
 
-          // If room becomes empty → cleanup
-          if (room.playerOrder.length === 0) {
-              // Remove room from memory
-              delete rooms[roomCode];
-          }
-      });
+            clearTimeout(room.roundTimeout);
+
+            room.nextDrawer();
+            startRound(roomCode);
+        }
+
+        if (room.playerOrder.length === 0) {
+            delete rooms[roomCode];
+        }
+    });
 
     socket.on("wordSelected", (word) => {
 
@@ -280,10 +282,7 @@ io.on("connection", (socket) => {
 
             io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 
-            const totalPlayers = room.playerOrder.length;
-            const totalCorrect = room.correctGuessers.size;
-
-            if (totalCorrect === totalPlayers - 1) {
+            if (room.correctGuessers.size === room.playerOrder.length - 1) {
 
                 clearTimeout(room.roundTimeout);
 

@@ -94,6 +94,17 @@ io.on("connection", (socket) => {
 
             io.to(roomCode).emit("clear");
         }
+        else{
+            if(room.getGameState() === "drawing"){
+                const currentWord = room.getWord();
+                const hint = room.getHint(currentWord);
+                io.to(socket.id).emit("hintUpdate",hint)
+                io.to(roomCode).emit("wordChosen", {
+                    length: room.getWord().length,
+                    word: room.getWord()
+                });
+            }
+        }
 
     });
 

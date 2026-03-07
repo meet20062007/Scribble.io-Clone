@@ -30,6 +30,11 @@ function startRound(roomCode) {
     }   
 
     roundResults.sort((a, b) => b.points - a.points);
+
+    if(room.countDownInterval){
+        clearInterval(room.countDownInterval);
+        room.countDownInterval = null;
+    }
     io.to(roomCode).emit("roundEnded", roundResults);
 
     room.currentRoundScores = {};
@@ -179,10 +184,18 @@ io.on("connection", (socket) => {
         // Start 90 second timer
         room.roundStartTime = Date.now();
         room.roundDuration = 90;
-        io.to(roomCode).emit("roundStarted", {
-            duration: 90,
-            startTime: Date.now()
-        });
+
+        room.countDownInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - room.roundStartTime) / 1000);
+            const timeleft = room.roundDuration - elapsed;
+            if (timeleft >= 0) {
+                io.to(roomCode).emit("timeleft", {timeleft});
+            }
+            else{
+                clearInterval(room.countDownInterval);
+                room.countDownInterval = null;
+            }
+        }, 1000);
 
         // 🔥 START HINT INTERVAL - Emit hint every 20 seconds
         if (room.hintInterval) {

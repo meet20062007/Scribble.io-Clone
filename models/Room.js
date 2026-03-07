@@ -6,6 +6,7 @@ class Room {
         this.currentDrawerIndex = 0;    //
         this.currentWord = null;    //
         this.correctGuessers = new Set();   //socketId of correct guessers for current round
+        this.countDownInterval = null;   //stores a timer Id which will execute every 1 sec to update time left for current round
         this.roundTimeout = null;       //stores a timer Id which will execute after 90 sec , this is used if we want to stop the timer when all players guess the word before 90 sec
         this.scores = {};   //socketId: score
         this.currentRoundScores = {};   //socketId:points for current round

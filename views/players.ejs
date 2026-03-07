@@ -336,33 +336,10 @@ canvas.addEventListener("touchend", () => {
             }
         }
     });
-    
-    let countdownInterval;
 
-    socket.on("roundStarted", ({ duration, startTime }) => {
-
+    socket.on("timeleft", ({timeleft}) => {
         const timerElement = document.getElementById("timer");
-
-        // Clear old interval if exists
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-        }
-        timerElement.textContent = duration;
-
-        function updateTimer() {
-
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const timeLeft = duration - elapsed;
-
-            timerElement.textContent = timeLeft > 0 ? timeLeft : 0;
-
-            if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
-            }
-        }
-
-        updateTimer();
-        countdownInterval = setInterval(updateTimer, 1000);//the setinterval is an inbuilt function which runs a specific function every given interval . In this case updateTimer every 1 second
+        timerElement.textContent = timeleft;
     });
 
             const wordSelection = document.getElementById("wordSelection");
@@ -463,9 +440,6 @@ canvas.addEventListener("touchend", () => {
 
         socket.on("roundEnded", (roundResults) => {
 
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
             const timerElement = document.getElementById("timer");
             timerElement.textContent = 90;
 

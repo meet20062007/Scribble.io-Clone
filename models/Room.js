@@ -4,7 +4,6 @@ class Room {
         this.players = {};      //socketId: username
         this.playerOrder = [];      //a vector stores socketId
         this.currentDrawerIndex = 0;    //
-        this.roundTimer=undefined;      //a bool flag , so that , we does not call startround multiple times if a new player joins
         this.currentWord = null;    //
         this.correctGuessers = new Set();   //socketId of correct guessers for current round
         this.roundTimeout = null;       //stores a timer Id which will execute after 90 sec , this is used if we want to stop the timer when all players guess the word before 90 sec
@@ -13,10 +12,10 @@ class Room {
         this.roundStartTime = null;     //Timestamp of when the round Started
         this.roundDuration = 90;    //
         this.gameState = "choosing a word";     //choosing a word,drawing
-        this.hintRevealCount = 0;
-        this.hintInterval = null;
-        this.revealedLetterIndices = new Set();
-        this.currentHint = "";
+        //this.hintRevealCount = 0;
+        this.hintInterval = null;   //stores a timer Id which will execute after 20 sec , this is used if we want to stop the timer when all players guess the word before 20 sec
+        this.revealedLetterIndices = new Set();     //stores indices of revraled letters for current round
+        this.currentHint = "";      //hint string , stores "_ i z _ _" for pizza
     }
 
     addPlayer(socketId, username) {
@@ -138,19 +137,19 @@ class Room {
         }
     }
 
-    incrementHintReveal() {
-        this.hintRevealCount++;
-    }
+    // incrementHintReveal() {
+    //     this.hintRevealCount++;
+    // }
 
     resetHintReveal() {
-        this.hintRevealCount = 0;
+        //this.hintRevealCount = 0;
         this.revealedLetterIndices.clear();
         this.currentHint = "";
     }
 
-    getHintRevealCount() {
-        return this.hintRevealCount;
-    }
+    // getHintRevealCount() {
+    //     return this.hintRevealCount;
+    // }
 
     // getDrawer() {
     //     return this.drawer;

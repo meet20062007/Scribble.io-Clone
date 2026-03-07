@@ -14,6 +14,9 @@ function joinroom(req,res){
         if (!rooms[roomCode]) {
             return res.send("Room not found");
         }
+        else if(rooms[roomCode].getGameState() === "drawing"){
+            return res.send("Game already in progress");
+        }
         return res.redirect(`/room/${roomCode}?username=${username}`);
     }
 }

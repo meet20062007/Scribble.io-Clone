@@ -77,16 +77,18 @@ io.on("connection", (socket) => {
 
         room.addPlayer(socket.id, username);
 
-        if (!room.roundTimer) {
-            room.roundTimer = true; // just to mark game started
-            startRound(roomCode);
-        }
-
         io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 
         const drawerId = room.getCurrentDrawer();
         const drawerName = room.players[drawerId];
         io.to(roomCode).emit("updateDrawer", {drawerId,drawerName,state: room.getGameState()});
+
+        if(Object.keys(room.players).length === 1){
+            const wordOptions = getRandomWords(3);
+            io.to(drawerId).emit("chooseWord", wordOptions);
+
+            io.to(roomCode).emit("clear");
+        }
 
     });
 
@@ -250,9 +252,7 @@ io.on("connection", (socket) => {
 
             io.to(socket.id).emit("revealWord", {correctWord});
 
-            io.to(roomCode).emit("correctGuess", {
-                username
-            });
+            io.to(roomCode).emit("correctGuess", {username});
 
             io.to(roomCode).emit("updatePlayers", room.getPlayerList());
 

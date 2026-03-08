@@ -85,6 +85,7 @@
 
     const playerList = document.getElementById("playerList");
     const leaveBtn = document.getElementById("leaveBtn");
+    let hasGuessedCorrectly = false;
     const canvas = document.getElementById("board");
     const toolRow = document.querySelector(".tool-row");
     const ctx = canvas.getContext("2d");
@@ -468,6 +469,27 @@ canvas.addEventListener("touchend", () => {
 
             guessBox.style.display = "block";
             toolRow.style.display = "none";
+        });
+
+        socket.on("loadCanvas", (canvasData) => {
+            canvasData.forEach((data) => {
+                ctx.strokeStyle = data.color || "black";
+                ctx.lineWidth = data.size || 3;
+
+                if (data.type === "start") {
+                    ctx.beginPath();
+                    ctx.moveTo(data.x, data.y);
+                }
+
+                if (data.type === "draw") {
+                    ctx.lineTo(data.x, data.y);
+                    ctx.stroke();
+                }
+
+                if (data.type === "end") {
+                    ctx.beginPath();
+                }
+            })
         });
 </script>
 

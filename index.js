@@ -21,6 +21,8 @@ function startRound(roomCode) {
     const room = rooms[roomCode];
     if (!room) return;
 
+    room.currentRoundCanvasData = [];
+
     const roundResults = [];
     for (let id in room.currentRoundScores) {
         roundResults.push({
@@ -96,6 +98,7 @@ io.on("connection", (socket) => {
         }
         else{
             if(room.getGameState() === "drawing"){
+                io.to(socket.id).emit("loadCanvas", room.currentRoundCanvasData);
                 const currentWord = room.getWord();
                 const hint = room.getHint(currentWord);
                 io.to(socket.id).emit("hintUpdate",hint)
@@ -118,6 +121,7 @@ io.on("connection", (socket) => {
 
         if (socket.id !== room.getCurrentDrawer()) return;
 
+        room.currentRoundCanvasData.push(data);
         socket.to(roomCode).emit("draw", data);
     });
 

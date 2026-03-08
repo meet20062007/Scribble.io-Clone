@@ -17,6 +17,7 @@ class Room {
         this.hintInterval = null;   //stores a timer Id which will execute after 20 sec , this is used if we want to stop the timer when all players guess the word before 20 sec
         this.revealedLetterIndices = new Set();     //stores indices of revraled letters for current round
         this.currentHint = "";      //hint string , stores "_ i z _ _" for pizza
+        this.currentRoundCanvasData = [];   //vector
     }
 
     addPlayer(socketId, username) {

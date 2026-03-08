@@ -4,74 +4,111 @@
     <title>Room <%= roomCode %></title>
     <link rel="stylesheet" href="/styles/game.css">
 </head>
+
 <body>
 
 <div class="app">
 
-    <div id="roundOverlay" class="overlay" style="display:none;">
-        <div class="scoreCard">
-            <h2 style="color: #000000;">Round Results</h2>
-            <ul id="roundScores"></ul>
-        </div>
+<!-- ROUND RESULT OVERLAY -->
+<div id="roundOverlay" class="overlay" style="display:none;">
+    <div class="scoreCard">
+        <h2>Round Results</h2>
+        <ul id="roundScores"></ul>
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+
+    <div class="room-section">
+        <h2>Room: <%= roomCode %></h2>
+        <h3 id="drawerText"></h3>
     </div>
 
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <div class="room-section">
-            <h2>Room: <%= roomCode %></h2>
-            <h3 id="drawerText"></h3>
-        </div>
-        <div class="timer-section">
-            ⏱ <span id="timer">90</span>s
-        </div>
+    <div id="wordHint"></div>
+
+    <div class="timer-section">
+        ⏱ <span id="timer">90</span>s
     </div>
 
-    <!-- MAIN AREA -->
-    <div class="main-container">
+</div>
 
-        <!-- LEFT: PLAYERS -->
-        <div class="players-panel">
-            <h3>Players</h3>
-            <ul id="playerList"></ul>
-            <button id="leaveBtn">Leave Room</button>
+<!-- MAIN AREA -->
+<div class="main-container">
+
+    <!-- PLAYERS -->
+    <div class="players-panel">
+
+        <h3>Players</h3>
+
+        <ul id="playerList"></ul>
+
+        <button id="leaveBtn">Leave</button>
+
+    </div>
+
+
+    <!-- CANVAS AREA -->
+    <div class="canvas-panel">
+
+        <canvas id="board" width="900" height="600"></canvas>
+
+        <!-- DRAWING TOOLS -->
+        <div class="tool-row">
+
+            <div id="colorPicker">
+
+                <button class="color-btn" data-color="#000000" style="background:#000000;"></button>
+                <button class="color-btn" data-color="#ff0000" style="background:#ff0000;"></button>
+                <button class="color-btn" data-color="#ff7f00" style="background:#ff7f00;"></button>
+                <button class="color-btn" data-color="#ffff00" style="background:#ffff00;"></button>
+                <button class="color-btn" data-color="#00cc00" style="background:#00cc00;"></button>
+                <button class="color-btn" data-color="#00cfff" style="background:#00cfff;"></button>
+                <button class="color-btn" data-color="#0066ff" style="background:#0066ff;"></button>
+                <button class="color-btn" data-color="#ff66cc" style="background:#ff66cc;"></button>
+                <button class="color-btn" data-color="#9933ff" style="background:#9933ff;"></button>
+                <button class="color-btn" data-color="#8b4513" style="background:#8b4513;"></button>
+                <button class="color-btn" data-color="#ffb6c1" style="background:#ffb6c1;"></button>
+                <button class="color-btn" data-color="#808080" style="background:#808080;"></button>
+                <button class="color-btn" data-color="#ffffff" style="background:#ffffff;border:2px solid black;"></button>
+
+            </div> 
+
+            <button id="eraserBtn">Eraser</button>
+            <button id="clearBtn">Clear</button>
+
         </div>
 
-        <!-- CENTER: CANVAS -->
-        <div class="canvas-panel">
-            <canvas id="board" width="1200" height="650"></canvas>
+        <!-- WORD SELECTION -->
+        <div id="wordSelection" style="display:none;">
 
-            <div class="tool-row">
-                <div id="colorPicker">
-                    <button class="color-btn" data-color="black" style="background:black;"></button>
-                    <button class="color-btn" data-color="red" style="background:red;"></button>
-                    <button class="color-btn" data-color="blue" style="background:blue;"></button>
-                    <button class="color-btn" data-color="green" style="background:green;"></button>
-                    <button class="color-btn" data-color="yellow" style="background:yellow;"></button>
-                </div>
+            <h3>Choose a word:</h3>
 
-                <button id="eraserBtn">🧽 Eraser</button>
-                <button id="clearBtn">Clear</button>
-            </div>
+            <div id="wordOptions"></div>
 
-            <div id="wordSelection" style="display:none;">
-                <h3>Choose a word:</h3>
-                <div id="wordOptions"></div>
-            </div>
-
-            <h1 id="wordHint"></h1>
-        </div>
-
-        <!-- RIGHT: CHAT -->
-        <div class="chat-panel">
-            <h3>Guess</h3>
-            <div id="chatMessages"></div>
-            <div id =guessBox>
-                <input type="text" id="chatInput" placeholder="Type your guess..." />
-                <button id="sendBtn">Send</button>
-            </div>
         </div>
 
     </div>
+
+
+    <!-- CHAT -->
+    <div class="chat-panel">
+
+        <h3>Guess</h3>
+
+        <div id="chatMessages"></div>
+
+        <div id="guessBox">
+
+            <input type="text" id="chatInput" placeholder="Type your guess..." />
+
+            <button id="sendBtn">Send</button>
+
+        </div>
+
+    </div>
+
+</div>
 
 </div>
 

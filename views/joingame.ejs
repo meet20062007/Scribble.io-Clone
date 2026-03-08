@@ -1,36 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scribble.io</title>
-    <style>    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Scribble.io</title>
+
+<link rel="stylesheet" href="/styles/join.css">
+
 </head>
+
 <body>
-     <form action="/joingame" method="POST">
 
-        <input 
-            type="text" 
-            name="username" 
-            placeholder="Enter your name" 
-            required
-        >
+<div class="join-container">
 
-        <input 
-            type="text" 
-            name="roomCode" 
-            placeholder="Enter room code (for join)"
-        >
+    <h1 class="title">Scribble.io</h1>
 
-        <button type="submit" name="action" value="create">
-            Create Room
-        </button>
+    <div class="card">
 
-        <button type="submit" name="action" value="join">
-            Join Room
-        </button>
+        <form action="/joingame" method="POST">
 
-    </form>
+            <input 
+                type="text" 
+                name="username" 
+                placeholder="Enter your name" 
+                required
+            >
+
+            <input 
+                type="text" 
+                name="roomCode" 
+                placeholder="Enter room code (for join)"
+            >
+
+            <div class="buttons">
+
+                <button type="submit" name="action" value="create">
+                    Create Room
+                </button>
+
+                <button type="submit" name="action" value="join">
+                    Join Room
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
 
 </body>
 </html>

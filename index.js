@@ -27,7 +27,8 @@ function startRound(roomCode) {
     for (let id in room.currentRoundScores) {
         roundResults.push({
             username: room.players[id],
-            points: room.currentRoundScores[id] || 0
+            points: room.currentRoundScores[id] || 0,
+            hasGuessed: room.hasGuessed(id)
         });
     }   
 
@@ -39,7 +40,9 @@ function startRound(roomCode) {
     }
     io.to(roomCode).emit("roundEnded", roundResults);
 
-    room.currentRoundScores = {};
+    for (const key in room.currentRoundScores) {
+        room.currentRoundScores[key] = 0;
+    }
 
     // 🔥 CLEAR OLD TIMER
     if (room.roundTimeout) {
@@ -98,9 +101,12 @@ io.on("connection", (socket) => {
         }
         else{
             if(room.getGameState() === "drawing"){
+
                 io.to(socket.id).emit("loadCanvas", room.currentRoundCanvasData);
+
                 const currentWord = room.getWord();
                 const hint = room.getHint(currentWord);
+
                 io.to(socket.id).emit("hintUpdate",hint)
                 io.to(roomCode).emit("wordChosen", {
                     length: room.getWord().length,

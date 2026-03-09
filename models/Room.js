@@ -24,6 +24,7 @@ class Room {
         this.players[socketId] = username;
         this.playerOrder.push(socketId);
         this.scores[socketId] = 0;
+        this.currentRoundScores[socketId] = 0;
     }
 
     getPlayerList() {
@@ -57,8 +58,6 @@ class Room {
 
         this.currentDrawerIndex =
             (this.currentDrawerIndex + 1) % this.playerOrder.length;
-
-        return this.getCurrentDrawer();
     }
     setWord(word) {
         this.currentWord = word;

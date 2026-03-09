@@ -19,7 +19,6 @@
 
 <!-- TOP BAR -->
 <div class="top-bar">
-
     <div class="room-section">
         <h2>Room: <%= roomCode %></h2>
         <h3 id="drawerText"></h3>
@@ -30,34 +29,23 @@
     <div class="timer-section">
         ⏱ <span id="timer">90</span>s
     </div>
-
 </div>
 
 <!-- MAIN AREA -->
 <div class="main-container">
-
     <!-- PLAYERS -->
     <div class="players-panel">
-
         <h3>Players</h3>
-
         <ul id="playerList"></ul>
-
         <button id="leaveBtn">Leave</button>
-
     </div>
-
 
     <!-- CANVAS AREA -->
     <div class="canvas-panel">
-
         <canvas id="board" width="900" height="600"></canvas>
-
         <!-- DRAWING TOOLS -->
         <div class="tool-row">
-
             <div id="colorPicker">
-
                 <button class="color-btn" data-color="#000000" style="background:#000000;"></button>
                 <button class="color-btn" data-color="#ff0000" style="background:#ff0000;"></button>
                 <button class="color-btn" data-color="#ff7f00" style="background:#ff7f00;"></button>
@@ -71,43 +59,27 @@
                 <button class="color-btn" data-color="#ffb6c1" style="background:#ffb6c1;"></button>
                 <button class="color-btn" data-color="#808080" style="background:#808080;"></button>
                 <button class="color-btn" data-color="#ffffff" style="background:#ffffff;border:2px solid black;"></button>
-
             </div> 
-
             <button id="eraserBtn">Eraser</button>
             <button id="clearBtn">Clear</button>
-
         </div>
 
         <!-- WORD SELECTION -->
         <div id="wordSelection" style="display:none;">
-
             <h3>Choose a word:</h3>
-
             <div id="wordOptions"></div>
-
         </div>
-
     </div>
-
 
     <!-- CHAT -->
     <div class="chat-panel">
-
         <h3>Guess</h3>
-
         <div id="chatMessages"></div>
-
         <div id="guessBox">
-
             <input type="text" id="chatInput" placeholder="Type your guess..." />
-
             <button id="sendBtn">Send</button>
-
         </div>
-
     </div>
-
 </div>
 
 </div>
@@ -244,62 +216,62 @@
 
     // ===== MOBILE TOUCH SUPPORT =====
 
-canvas.addEventListener("touchstart", (e) => {
-    if (!isDrawer) return;
+    canvas.addEventListener("touchstart", (e) => {
+        if (!isDrawer) return;
 
-    e.preventDefault();
+        e.preventDefault();
 
-    drawing = true;
+        drawing = true;
 
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
 
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
 
-    ctx.beginPath();
-    ctx.moveTo(x, y);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
 
-    socket.emit("draw", {
-        x,
-        y,
-        type: "start",
-        color: currentColor,
-        size: currentSize
+        socket.emit("draw", {
+            x,
+            y,
+            type: "start",
+            color: currentColor,
+            size: currentSize
+        });
     });
-});
 
-canvas.addEventListener("touchmove", (e) => {
-    if (!drawing || !isDrawer) return;
+    canvas.addEventListener("touchmove", (e) => {
+        if (!drawing || !isDrawer) return;
 
-    e.preventDefault();
+        e.preventDefault();
 
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
 
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
 
-    ctx.lineTo(x, y);
-    ctx.stroke();
+        ctx.lineTo(x, y);
+        ctx.stroke();
 
-    socket.emit("draw", {
-        x,
-        y,
-        type: "draw",
-        color: currentColor,
-        size: currentSize
+        socket.emit("draw", {
+            x,
+            y,
+            type: "draw",
+            color: currentColor,
+            size: currentSize
+        });
     });
-});
 
-canvas.addEventListener("touchend", () => {
-    if (!isDrawer) return;
+    canvas.addEventListener("touchend", () => {
+        if (!isDrawer) return;
 
-    drawing = false;
-    ctx.beginPath();
+        drawing = false;
+        ctx.beginPath();
 
-    socket.emit("draw", { type: "end" });
-});
+        socket.emit("draw", { type: "end" });
+    });
 
     function draw(x, y) {
         ctx.lineTo(x, y);
@@ -380,15 +352,15 @@ canvas.addEventListener("touchend", () => {
         timerElement.textContent = timeleft;
     });
 
-            const wordSelection = document.getElementById("wordSelection");
-        const wordOptionsDiv = document.getElementById("wordOptions");
-        const wordHint = document.getElementById("wordHint");
-        let wordLength = 0;
+    const wordSelection = document.getElementById("wordSelection");
+    const wordOptionsDiv = document.getElementById("wordOptions");
+    const wordHint = document.getElementById("wordHint");
+    let wordLength = 0;
 
-        socket.on("chooseWord", (words) => {
+    socket.on("chooseWord", (words) => {
 
-            wordSelection.style.display = "block";
-            wordOptionsDiv.innerHTML = "";
+        wordSelection.style.display = "block";
+        wordOptionsDiv.innerHTML = "";
 
             words.forEach(word => {
                 const btn = document.createElement("button");
@@ -490,6 +462,10 @@ canvas.addEventListener("touchend", () => {
             roundResults.forEach(player => {
                 const li = document.createElement("li");
                 li.textContent = player.username + " + " + player.points;
+                if(!player.hasGuessed && player.points === 0)
+                    li.style.color = "#ff0000";
+                else
+                    li.style.color = "#00cc00";
                 list.appendChild(li);
             });
 
